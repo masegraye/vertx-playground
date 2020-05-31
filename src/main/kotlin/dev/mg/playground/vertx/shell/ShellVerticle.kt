@@ -23,8 +23,7 @@ class ShellVerticle : CoroutineVerticle() {
                             ==== Welcome to the Vert.x Playground ====
                             ==========================================
                             
-                            Type `help` to see available commands
-                            
+                            Type `help` to see available commands 
                         """.trimIndent()
             })
 

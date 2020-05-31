@@ -13,26 +13,26 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class WebVertcle : CoroutineVerticle() {
     private lateinit var server: HttpServer
-    private var requestsHandled = AtomicInteger(0)
+    private var requestsHandled: Long = 0
     override suspend fun start() {
         server = vertx.createHttpServer()
         server.requestHandler { req ->
             req.response().run {
+                requestsHandled += 1
                 putHeader("content-type", "text/plain")
-                end("Request number: ${requestsHandled.incrementAndGet()}")
+                end("Request number: $requestsHandled")
             }
         }
         server.listenAwait(8080)
 
         vertx.eventBus().consumer<JsonObject>("web.info") { msg ->
             msg.reply(json {
-                obj("requestCount" to requestsHandled.toInt())
+                obj("requestCount" to requestsHandled)
             })
         }
-
         val cmd = CommandBuilder.command("request-count").let { builder ->
             builder.processHandler { process ->
-                vertx.eventBus().request<JsonObject>("web.info", json { obj()}) {
+                vertx.eventBus().request<JsonObject>("web.info", json { obj() }) {
                     if (it.succeeded()) {
                         process.write(it.result().body().encode())
                         process.write("\n")
