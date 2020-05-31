@@ -8,7 +8,7 @@ import io.vertx.kotlin.ext.shell.startAwait
 import io.vertx.kotlin.ext.shell.stopAwait
 
 class ShellVerticle : CoroutineVerticle() {
-    private var service: ShellService? = null
+    private lateinit var service: ShellService
 
     override suspend fun start() {
         service = ShellService
@@ -17,11 +17,21 @@ class ShellVerticle : CoroutineVerticle() {
                     host = "localhost"
                     port = 4000
                 }
+                welcomeMessage =
+                        """
+                            ==========================================
+                            ==== Welcome to the Vert.x Playground ====
+                            ==========================================
+                            
+                            Type `help` to see available commands
+                            
+                        """.trimIndent()
             })
-        service?.startAwait()
+
+        service.startAwait()
     }
 
     override suspend fun stop() {
-        service?.stopAwait()
+        service.stopAwait()
     }
 }
